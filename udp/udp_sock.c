@@ -53,9 +53,11 @@ static _inline int __port_used(unsigned short port, struct hlist_head *head)
 {
 	struct hlist_node *node;
 	struct sock *sk;
+
 	hlist_for_each_sock(sk, node, head)
 		if (sk->sk_sport == _htons(port))
 			return 1;
+
 	return 0;
 }
 
@@ -76,6 +78,7 @@ static _inline unsigned short udp_get_best_port(void)
 				break;
 			port += UDP_HASH_SIZE;
 		}
+
 		if (port >= UDP_PORT_MAX)
 			return 0;
 	}
@@ -159,8 +162,8 @@ static unsigned short udp_get_port(void)
 static int udp_set_sport(struct sock *sk, unsigned short nport)
 {
 	int hash, err = -1;
-
 	udp_htable_lock();
+
 	/*
 	 * Order cannot be reversed:
 	 *  1. check used port
@@ -180,6 +183,7 @@ static int udp_set_sport(struct sock *sk, unsigned short nport)
 	sk->sk_sport = nport;
 	if (sk->ops->hash)
 		sk->ops->hash(sk);
+
 unlock:
 	udp_htable_unlock();
 	return err;
@@ -256,6 +260,7 @@ static int udp_send_buf(struct sock *sk, void *buf, int size,
 	/* destination address check */
 	if (size <= 0 || size > UDP_MAX_BUFSZ)
 		return -1;
+
 	if (skaddr) {
 		sk_addr.dst_addr = skaddr->dst_addr;
 		sk_addr.dst_port = skaddr->dst_port;
@@ -263,6 +268,7 @@ static int udp_send_buf(struct sock *sk, void *buf, int size,
 		sk_addr.dst_addr = sk->sk_daddr;
 		sk_addr.dst_port = sk->sk_dport;
 	}
+
 	if (!sk_addr.dst_addr || !sk_addr.dst_port)
 		return -1;
 	if (!sk->sk_sport && sock_autobind(sk) < 0)

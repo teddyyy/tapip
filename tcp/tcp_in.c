@@ -7,34 +7,42 @@ static char *tcp_control_string(struct tcp *tcphdr)
 {
 	static char ss[32];
 	char *ssp = ss;
+
 	if (tcphdr->fin) {
 		strcpy(ssp, "FIN|");
 		ssp += 4;
 	}
+
 	if (tcphdr->syn) {
 		strcpy(ssp, "SYN|");
 		ssp += 4;
 	}
+
 	if (tcphdr->rst) {
 		strcpy(ssp, "RST|");
 		ssp += 4;
 	}
+
 	if (tcphdr->psh) {
 		strcpy(ssp, "PSH|");
 		ssp += 4;
 	}
+
 	if (tcphdr->ack) {
 		strcpy(ssp, "ACK|");
 		ssp += 4;
 	}
+
 	if (tcphdr->urg) {
 		strcpy(ssp, "URG|");
 		ssp += 4;
 	}
+
 	if (ssp == ss)
 		ssp[0] = '\0';
 	else
 		ssp[-1] = '\0';
+
 	return ss;
 }
 
@@ -72,6 +80,7 @@ static void tcp_recv(struct pkbuf *pkb, struct ip *iphdr, struct tcp *tcphdr)
 	sk = tcp_lookup_sock(iphdr->ip_src, iphdr->ip_dst,
 				tcphdr->src, tcphdr->dst);
 	tcp_process(pkb, &seg, sk);
+
 	if (sk)
 		free_sock(sk);
 }

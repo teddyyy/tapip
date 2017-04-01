@@ -18,6 +18,7 @@ static void udp_recv(struct pkbuf *pkb, struct ip *iphdr, struct udp *udphdr)
 	/* FIFO receive queue */
 	list_add_tail(&pkb->pk_list, &sk->recv_queue);
 	sk->ops->recv_notify(sk);
+
 	/* We have handled the input packet with sock, so release it */
 	free_sock(sk);
 	return;
@@ -45,11 +46,11 @@ void udp_in(struct pkbuf *pkb)
 		udpdbg("udp packet checksum corrupts");
 		goto drop_pkb;
 	}
+
 	/*
 	 * Should we check source ip address?
 	 * Maybe ip layer does it for us!
 	 */
-
 	udpdbg("from "IPFMT":%d" " to " IPFMT ":%d",
 			ipfmt(iphdr->ip_src), _ntohs(udphdr->src),
 			ipfmt(iphdr->ip_dst), _ntohs(udphdr->dst));
