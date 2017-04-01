@@ -137,10 +137,12 @@ void stat(int argc, char **argv)
 		" alloced pkbs: %d\n"
 		" free pkbs:    %d\n",
 		alloc_pkbs, free_pkbs);
+
 	printf("[sock memory information]\n"
 		" alloced socks: %d\n"
 		" free socks:    %d\n",
 		alloc_socks, free_socks);
+
 	printf("[cbuf memory information]\n"
 		" alloced circular buffers: %d\n"
 		" free circular buffers:    %d\n",

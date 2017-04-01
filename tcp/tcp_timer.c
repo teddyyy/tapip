@@ -44,6 +44,7 @@ void tcp_timer(void)
 	unsigned int i = 0;
 	/* init */
 	timewait.next = NULL;
+
 	while (1) {
 		usleep(TCP_TIMER_DELTA);
 		i++;

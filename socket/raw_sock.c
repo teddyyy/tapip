@@ -61,9 +61,11 @@ static int raw_send_buf(struct sock *sk, void *buf, int size,
 	struct pkbuf *pkb;
 	if (size < 0 || size > RAW_MAX_BUFSZ)
 		return -1;
+
 	pkb = alloc_pkb(ETH_HRD_SZ + IP_HRD_SZ + size);
 	memcpy(pkb->pk_data + ETH_HRD_SZ + IP_HRD_SZ, buf, size);
 	raw_init_pkb(sk, pkb, skaddr);
+
 	if (sk->ops->send_pkb)
 		return sk->ops->send_pkb(sk, pkb);
 	else
@@ -91,6 +93,7 @@ struct sock *raw_alloc_sock(int protocol)
 	raw_sk->sk.ops = &raw_ops;
 	raw_sk->sk.hash = protocol;	/* for raw_hash() */
 	raw_id++;
+
 	/* return sk refcnt is 0! */
 	return &raw_sk->sk;
 }
@@ -115,6 +118,7 @@ static _inline struct sock *__raw_lookup_sock(struct hlist_head *head,
 			(!sk->sk_daddr || sk->sk_daddr == dst))
 			return sk;
 	}
+
 	return NULL;
 }
 

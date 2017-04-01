@@ -31,6 +31,7 @@ int tcp_write_buf(struct tcp_sock *tsk, void *data, unsigned int len)
 		tsk->rcv_wnd -= rlen;	/* assert rlen >= 0 */
 		tsk->rcv_nxt += rlen;
 	}
+
 	return rlen;
 }
 
@@ -114,6 +115,7 @@ int tcp_send_text(struct tcp_sock *tsk, void *buf, int len)
 		tcp_send_ack(tsk, NULL);
 		slen = -1;
 	}
+
 	return slen;
 }
 

@@ -75,10 +75,12 @@ static int parse_args(int argc, char **argv)
 		printf("Packet size %d is too large. Maximum is 65507\n", size);
 		return -2;
 	}
+
 	if (ttl < 0 || ttl > 255) {
 		printf("ttl %d out of range\n", ttl);
 		return -2;
 	}
+
 	if (finite && count <= 0)
 		printf("bad number of packets to transmit\n");
 
@@ -91,6 +93,7 @@ static int parse_args(int argc, char **argv)
 		printf("bad ip address %s\n", *argv);
 		return -2;
 	}
+
 	return 0;
 }
 
@@ -131,6 +134,7 @@ void sigalrm(int num)
 		alarm(1);
 		send_packet();
 	}
+
 	signal_wait(SIGQUIT);
 }
 
@@ -145,6 +149,7 @@ void ping2(int argc, char **argv)
 			usage();
 		return;
 	}
+
 	/* signal install */
 	signal(SIGALRM, sigalrm);
 	/* send packet and debug */

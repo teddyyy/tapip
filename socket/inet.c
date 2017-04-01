@@ -55,6 +55,7 @@ static int inet_socket(struct socket *sock, int protocol)
 	/* only used by raw ip */
 	if (sk->hash && sk->ops->hash)
 		sk->ops->hash(sk);
+
 	return 0;
 }
 
@@ -72,6 +73,7 @@ static int inet_close(struct socket *sock)
 		free_sock(sk);
 		sock->sk = NULL;
 	}
+
 	return err;
 }
 
@@ -106,6 +108,7 @@ static int inet_listen(struct socket *sock, int backlog)
 		return -1;
 	if (sk)
 		err = sk->ops->listen(sk, backlog);
+
 	return err;
 }
 
@@ -113,6 +116,7 @@ static int inet_bind(struct socket *sock, struct sock_addr *skaddr)
 {
 	struct sock *sk = sock->sk;
 	int err = -1;
+
 	/* protocol defined bind (e.g: raw bind) */
 	if (sk->ops->bind)
 		return sk->ops->bind(sock->sk, skaddr);
@@ -135,6 +139,7 @@ static int inet_bind(struct socket *sock, struct sock_addr *skaddr)
 	} else {
 		sk->sk_sport = skaddr->src_port;
 	}
+
 	/* bind success */
 	err = 0;
 	/* clear connection */
@@ -148,6 +153,7 @@ static int inet_connect(struct socket *sock, struct sock_addr *skaddr)
 {
 	struct sock *sk = sock->sk;
 	int err = -1;
+
 	/* sanity check */
 	if (!skaddr->dst_port || !skaddr->dst_addr)
 		goto out;
@@ -165,6 +171,7 @@ static int inet_connect(struct socket *sock, struct sock_addr *skaddr)
 		sk->sk_dst = rt;
 		sk->sk_saddr = sk->sk_dst->rt_dev->net_ipaddr;
 	}
+
 	/* protocol must support its own connect */
 	if (sk->ops->connect)
 		err = sk->ops->connect(sk, skaddr);
@@ -182,6 +189,7 @@ static int inet_read(struct socket *sock, void *buf, int len)
 		ret = sk->ops->recv_buf(sock->sk, buf, len);
 		sk->recv_wait = NULL;
 	}
+
 	return ret;
 }
 
@@ -191,6 +199,7 @@ static int inet_write(struct socket *sock, void *buf, int len)
 	int ret = -1;
 	if (sk)
 		ret = sk->ops->send_buf(sock->sk, buf, len, NULL);
+
 	return ret;
 }
 
@@ -200,6 +209,7 @@ static int inet_send(struct socket *sock, void *buf, int size,
 	struct sock *sk = sock->sk;
 	if (sk)
 		return sk->ops->send_buf(sock->sk, buf, size, skaddr);
+
 	return -1;
 }
 
@@ -212,6 +222,7 @@ static struct pkbuf *inet_recv(struct socket *sock)
 		pkb = sk->ops->recv(sock->sk);
 		sk->recv_wait = NULL;
 	}
+
 	return pkb;
 }
 

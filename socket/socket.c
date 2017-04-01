@@ -103,10 +103,12 @@ int _connect(struct socket *sock, struct sock_addr *skaddr)
 	int err = -1;
 	if (!sock || !skaddr)
 		goto out;
+
 	get_socket(sock);
 	if (sock->ops) {
 		err = sock->ops->connect(sock, skaddr);
 	}
+
 	free_socket(sock);
 out:
 	return err;
@@ -117,9 +119,11 @@ int _bind(struct socket *sock, struct sock_addr *skaddr)
 	int err = -1;
 	if (!sock || !skaddr)
 		goto out;
+
 	get_socket(sock);
 	if (sock->ops)
 		err = sock->ops->bind(sock, skaddr);
+
 	free_socket(sock);
 out:
 	return err;

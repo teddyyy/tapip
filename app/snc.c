@@ -48,6 +48,7 @@ static int create_socket(void)
 		debug("_socket error");
 		return -1;
 	}
+
 	return 0;
 }
 
@@ -123,23 +124,28 @@ static void recv_tcp_packet(void)
 {
 	char buf[512];
 	int len;
+
 	debug("listen with backlog:10");
 	if (_listen(sock, 10) < 0) {
 		debug("listen error");
 		return;
 	}
+
 	csock = _accept(sock, &skaddr);
 	if (!csock) {
 		debug("Three-way handshake error");
 		return;
 	}
+
 	debug("Three-way handshake successes: from "IPFMT":%d\n",
 			ipfmt(skaddr.src_addr), _ntohs(skaddr.src_port));
 	debug("starting _read()...");
+
 	while ((len = _read(csock, buf, 512)) > 0) {
 		printf("%.*s", len, buf);
 		fflush(stdout);
 	}
+
 	debug("last _read() return %d", len);
 }
 
@@ -157,11 +163,13 @@ static void recv_udp_packet(void)
 			debug("recv no pkb");
 			break;
 		}
+
 		iphdr = pkb2ip(pkb);
 		udphdr = ip2udp(iphdr);
 		debug("ip: %d bytes from " IPFMT ":%d", ipdlen(iphdr),
 						ipfmt(iphdr->ip_src),
 						_ntohs(udphdr->src));
+
 		/* output stdin */
 		len = _ntohs(udphdr->length) - UDP_HRD_SZ;
 		if (write(1, udphdr->data, len) != len) {
@@ -179,6 +187,7 @@ static void recv_packet(void)
 			debug("_bind error");
 			return;
 	}
+
 	debug("bind " IPFMT ":%d", ipfmt(sock->sk->sk_saddr),
 					_ntohs(sock->sk->sk_sport));
 
@@ -218,6 +227,7 @@ static int parse_args(int argc, char **argv)
 		default:
 			return -1;
 		}
+
 		if (err < 0) {
 			printf("%s:address format is error\n", optarg);
 			return -2;
@@ -228,20 +238,24 @@ static int parse_args(int argc, char **argv)
 		return -1;
 	if ((flags & (F_BIND|F_CONNECT)) == 0)
 		return -1;
+
 	argc -= optind;
 	argv += optind;
+
 	if (argc > 0)
 		return -1;
 	if (flags & F_UDP) {
 		type = SOCK_DGRAM;
 		prostr = "UDP";
 	}
+
 	return 0;
 }
 
 static void init_options(void)
 {
 	memset(&skaddr, 0x0, sizeof(skaddr));
+
 	type = SOCK_STREAM;	/* default TCP stream */
 	prostr = "TCP";
 	flags = F_TCP;
@@ -265,12 +279,14 @@ void snc(int argc, char **argv)
 	int err;
 	/* init arguments */
 	init_options();
+
 	/* parse arguments */
 	if ((err = parse_args(argc, argv)) < 0) {
 		if (err == -1)
 			usage();
 		return;
 	}
+
 	/* signal install */
 	if (init_signal() < 0)
 		goto out;

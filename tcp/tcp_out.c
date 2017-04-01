@@ -18,6 +18,7 @@ static int tcp_init_pkb(struct tcp_sock *tsk, struct pkbuf *pkb,
 	iphdr->ip_ttl = TCP_DEFAULT_TTL;
 	iphdr->ip_pro = IP_P_TCP;
 	iphdr->ip_dst = daddr;
+
 	/* NOTE: tsk maybe NULL, if connect doesnt exist */
 	if (tsk && tsk->sk.sk_dst) {
 		pkb->pk_rtdst = tsk->sk.sk_dst;
@@ -28,6 +29,7 @@ static int tcp_init_pkb(struct tcp_sock *tsk, struct pkbuf *pkb,
 			tsk->sk.sk_dst = pkb->pk_rtdst;
 	}
 	iphdr->ip_src = saddr;
+
 	return 0;
 }
 
@@ -50,6 +52,7 @@ void tcp_send_out(struct tcp_sock *tsk, struct pkbuf *pkb, struct tcp_segment *s
 		free_pkb(pkb);
 		return;
 	}
+
 	tcp_set_checksum(iphdr, tcphdr);
 	ip_send_out(pkb);
 }
@@ -66,6 +69,7 @@ void tcp_send_reset(struct tcp_sock *tsk, struct tcp_segment *seg)
 
 	if (tcphdr->rst)
 		return;
+
 	opkb = alloc_pkb(ETH_HRD_SZ + IP_HRD_SZ + TCP_HRD_SZ);
 	/* fill tcp head */
 	otcp = (struct tcp *)pkb2ip(opkb)->ip_data;
@@ -83,6 +87,7 @@ void tcp_send_reset(struct tcp_sock *tsk, struct tcp_segment *seg)
 		otcp->ackn = _htonl(seg->seq + seg->len);
 		otcp->ack = 1;
 	}
+
 	otcp->doff = TCP_HRD_DOFF;
 	otcp->rst = 1;
 	tcpdbg("send RESET from "IPFMT":%d to "IPFMT":%d",
@@ -116,6 +121,7 @@ void tcp_send_ack(struct tcp_sock *tsk, struct tcp_segment *seg)
 
 	if (tcphdr->rst)
 		return;
+
 	opkb = alloc_pkb(ETH_HRD_SZ + IP_HRD_SZ + TCP_HRD_SZ);
 	/* fill tcp head */
 	otcp = (struct tcp *)pkb2ip(opkb)->ip_data;
@@ -146,6 +152,7 @@ void tcp_send_synack(struct tcp_sock *tsk, struct tcp_segment *seg)
 
 	if (tcphdr->rst)
 		return;
+
 	opkb = alloc_pkb(ETH_HRD_SZ + IP_HRD_SZ + TCP_HRD_SZ);
 	/* fill tcp head */
 	otcp = (struct tcp *)pkb2ip(opkb)->ip_data;

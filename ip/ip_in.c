@@ -108,6 +108,7 @@ void ip_in(struct netdev *dev, struct pkbuf *pkb)
 				ipfmt(iphdr->ip_src), ipfmt(iphdr->ip_dst),
 				hlen, iphdr->ip_len);
 	ip_recv_route(pkb);
+
 	return;
 
 err_free_pkb:

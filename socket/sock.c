@@ -64,6 +64,7 @@ struct pkbuf *sock_recv_pkb(struct sock *sk)
 		if (sleep_on(sk->recv_wait) < 0)
 			break;
 	}
+
 	return pkb;
 }
 
@@ -80,6 +81,7 @@ int sock_close(struct sock *sk)
 		list_del(&pkb->pk_list);
 		free_pkb(pkb);
 	}
+
 	return 0;
 }
 
@@ -87,5 +89,6 @@ int sock_autobind(struct sock *sk)
 {
 	if (sk->ops->set_port)
 		return sk->ops->set_port(sk, 0);
+
 	return -1;
 }

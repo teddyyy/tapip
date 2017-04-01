@@ -57,10 +57,12 @@ void ip_send_out(struct pkbuf *pkb)
 		free_pkb(pkb);
 		return;
 	}
+
 	ip_set_checksum(iphdr);
 	ipdbg(IPFMT " -> " IPFMT "(%d/%d bytes)",
 			ipfmt(iphdr->ip_src), ipfmt(iphdr->ip_dst),
 			iphlen(iphdr), _ntohs(iphdr->ip_len));
+
 	/* ip fragment */
 	if (_ntohs(iphdr->ip_len) > pkb->pk_rtdst->rt_dev->net_mtu)
 		ip_send_frag(pkb->pk_rtdst->rt_dev, pkb);

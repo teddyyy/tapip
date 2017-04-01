@@ -39,6 +39,7 @@ struct fragment *new_frag(struct ip *iphdr)
 	frag->frag_flags = 0;
 	list_add(&frag->frag_list, &frag_head);
 	list_init(&frag->frag_pkb);
+
 	return frag;
 }
 
@@ -52,6 +53,7 @@ void delete_frag(struct fragment *frag)
 		list_del(&pkb->pk_list);
 		free_pkb(pkb);
 	}
+
 	free(frag);
 	/* FIXME: icmp DESTINATION */
 }
@@ -239,6 +241,7 @@ struct pkbuf *ip_frag(struct pkbuf *pkb, struct ip *orig, int hlen,
 	mf_bit |= (off >> 3);
 	fraghdr->ip_fragoff = _htons(mf_bit);
 	ip_set_checksum(fraghdr);
+
 	return fragpkb;
 }
 
@@ -269,6 +272,7 @@ void ip_send_frag(struct netdev *dev, struct pkbuf *pkb)
 					iphdr->ip_fragoff & IP_FRAG_MF);
 		ip_send_dev(dev, fragpkb);
 	}
+
 	free_pkb(pkb);
 }
 

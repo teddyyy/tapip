@@ -79,7 +79,9 @@ static _inline unsigned short udp_get_best_port(void)
 		if (port >= UDP_PORT_MAX)
 			return 0;
 	}
+
 	best->used++;
+
 	return port;
 }
 
@@ -103,6 +105,7 @@ static int udp_get_port_slow(void)
 	int best_slot = udp_table.best_slot;
 	int best_used = udp_best_slot()->used;
 	int i;
+
 	/* find the best one */
 	for (i = 0; i < UDP_HASH_SIZE; i++) {
 		if (udp_hash_slot(i)->used < best_used)	{
@@ -110,12 +113,15 @@ static int udp_get_port_slow(void)
 			best_slot = i;
 		}
 	}
+
 	/* Not found, table is full */
 	if (best_slot == udp_table.best_slot)
 		return 0;
+
 	/* update best slot */
 	udp_table.best_slot = best_slot;
 	udp_table.best_update = UDP_BEST_UPDATE;
+
 	/* Assert that we can get one valid port! */
 	return udp_get_best_port();
 }
@@ -146,6 +152,7 @@ static unsigned short udp_get_port(void)
 			}
 		}
 	}
+
 	return _htons(port);
 }
 
@@ -210,6 +217,7 @@ static int udp_init_pkb(struct sock *sk, struct pkbuf *pkb,
 {
 	struct ip *iphdr = pkb2ip(pkb);
 	struct udp *udphdr = (struct udp *)iphdr->ip_data;
+
 	/* fill ip head */
 	iphdr->ip_hlen = IP_HRD_SZ >> 2;
 	iphdr->ip_ver = IP_VERSION_4;
@@ -220,9 +228,11 @@ static int udp_init_pkb(struct sock *sk, struct pkbuf *pkb,
 	iphdr->ip_ttl = UDP_DEFAULT_TTL;
 	iphdr->ip_pro = sk->protocol;	/* IP_P_UDP */
 	iphdr->ip_dst = skaddr->dst_addr;
+
 	/* FIXME:use the sk->rt_dst */
 	if (rt_output(pkb) < 0)		/* fill ip src */
 		return -1;
+
 	/* fill udp */
 	udphdr->src = sk->sk_sport;	/* bound local address */
 	udphdr->dst = skaddr->dst_port;
@@ -233,6 +243,7 @@ static int udp_init_pkb(struct sock *sk, struct pkbuf *pkb,
 			ipfmt(iphdr->ip_dst), _ntohs(udphdr->dst),
 			iphdr->ip_pro);
 	udp_set_checksum(iphdr, udphdr);
+
 	return 0;
 }
 
@@ -256,12 +267,14 @@ static int udp_send_buf(struct sock *sk, void *buf, int size,
 		return -1;
 	if (!sk->sk_sport && sock_autobind(sk) < 0)
 		return -1;
+
 	/* udp packet send */
 	pkb = alloc_pkb(ETH_HRD_SZ + IP_HRD_SZ + UDP_HRD_SZ + size);
 	if (udp_init_pkb(sk, pkb, buf, size, &sk_addr) < 0) {
 		free_pkb(pkb);
 		return -1;
 	}
+
 	if (sk->ops->send_pkb)
 		return sk->ops->send_pkb(sk, pkb);
 	else
@@ -285,12 +298,14 @@ struct sock *udp_lookup_sock(unsigned short nport)
 	struct hlist_head *head = udp_slot_head(_ntohs(nport));
 	struct hlist_node *node;
 	struct sock *sk;
+
 	/* FIXME: lock for udp hash table */
 	if (hlist_empty(head))
 		return NULL;
 	hlist_for_each_sock(sk, node, head)
 		if (sk->sk_sport == nport)
 			return get_sock(sk);
+
 	return NULL;
 }
 
@@ -298,11 +313,13 @@ void udp_init(void)
 {
 	struct hash_slot *slot;
 	int i;
+
 	/* init udp hash table */
 	for (slot = udp_hash_slot(i = 0); i < UDP_HASH_SIZE; i++, slot++) {
 		hlist_head_init(&slot->head);
 		slot->used = 0;
 	}
+
 	udp_table.best_slot = 0;
 	udp_table.best_update = UDP_BEST_UPDATE;
 	pthread_mutex_init(&udp_table.mutex, NULL);
@@ -315,9 +332,11 @@ struct sock *udp_alloc_sock(int protocol)
 	struct udp_sock *udp_sk;
 	if (protocol && protocol != IP_P_UDP)
 		return NULL;
+
 	udp_sk = xzalloc(sizeof(*udp_sk));
 	alloc_socks++;
 	udp_sk->sk.ops = &udp_ops;
 	udp_id++;
+
 	return &udp_sk->sk;
 }

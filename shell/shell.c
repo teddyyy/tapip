@@ -118,6 +118,7 @@ static int get_line(char *buf, int bufsz)
 		strcpy(buf, "exit");
 		p = buf;
 	}
+
 	len = strlen(p);
 	if (len == 0)
 		return 0;
@@ -125,6 +126,7 @@ static int get_line(char *buf, int bufsz)
 		p[len - 1] = '\0';
 		len--;
 	}
+
 	return len;
 }
 
@@ -133,11 +135,13 @@ static char *get_arg(char **pp)
 	char *ret, *p;
 	ret = NULL;
 	p = *pp;
+
 	/* skip white space and fill \0 */
 	while (isblank(*p)) {
 		*p = '\0';
 		p++;
 	}
+
 	if (*p == '\0')
 		goto out;
 	ret = p;
@@ -146,6 +150,7 @@ static char *get_arg(char **pp)
 		p++;
 out:
 	*pp = p;
+
 	return ret;
 }
 
@@ -161,6 +166,7 @@ static int parse_line(char *line, int len, char **argv)
 	argc = 0;
 	while ((p = get_arg(&pp)) != NULL)
 		argv[argc++] = p;
+
 	return argc;
 }
 
@@ -178,6 +184,7 @@ void *shell_worker(void *none)
 	}
 out:
 	dbg("shell worker exit");
+
 	return NULL;
 }
 

@@ -2,6 +2,7 @@
  * ping - raw ip version
  *        It is implemented based on tapip _socket() apis!
  */
+
 #include "lib.h"
 #include "netif.h"
 #include "ip.h"
@@ -77,19 +78,23 @@ static int parse_args(int argc, char **argv)
 			return -1;
 		}
 	}
+
 	if (size < 0 || size > 65507) {
 		printf("Packet size %d is too large. Maximum is 65507\n", size);
 		return -2;
 	}
+
 	if (ttl < 0 || ttl > 255) {
 		printf("ttl %d out of range\n", ttl);
 		return -2;
 	}
+
 	if (finite && count <= 0)
 		printf("bad number of packets to transmit\n");
 
 	argc -= optind;
 	argv += optind;
+
 	if (argc != 1)
 		return -1;
 
@@ -97,6 +102,7 @@ static int parse_args(int argc, char **argv)
 		printf("bad ip address %s\n", *argv);
 		return -2;
 	}
+
 	return 0;
 }
 
@@ -122,6 +128,7 @@ static void send_packet(void)
 {
 	if (!buf)
 		buf = xmalloc(size + ICMP_HRD_SZ);
+
 	struct icmp *icmphdr = (struct icmp *)buf;
 	static int first = 1;
 	if (first) {
@@ -181,6 +188,7 @@ static void recv_packet(void)
 	struct pkbuf *pkb;
 	struct ip *iphdr;
 	struct icmp *icmphdr;
+
 	while (!finite || recv > 0) {
 		pkb = _recv(sock);
 		if (!pkb)

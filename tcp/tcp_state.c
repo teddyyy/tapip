@@ -41,6 +41,7 @@ unsigned int alloc_new_iss(void)
 	static unsigned int iss = 12345678;
 	if (++iss >= 0xffffffff)
 		iss = 12345678;
+
 	return iss;
 }
 
@@ -54,17 +55,20 @@ static struct tcp_sock *tcp_listen_child_sock(struct tcp_sock *tsk,
 	newsk->sk_daddr = seg->iphdr->ip_src;
 	newsk->sk_sport = seg->tcphdr->dst;
 	newsk->sk_dport = seg->tcphdr->src;
+
 	/* add to establish hash table for third ACK */
 	if (tcp_hash(&newtsk->sk) < 0) {
 		free(newsk);
 		return NULL;
 	}
+
 	/*
 	 * Why to get parent reference?
 	 * To avoid parent accidental release.
 	 * e.g: Parent is interrupted by user
 	 *      when child is pending in three-way handshake.
 	 */
+
 	newtsk->parent = get_tcp_sock(tsk);
 	/* FIXME: add limit to listen queue */
 	list_add(&newtsk->list, &tsk->listen_queue);
@@ -78,6 +82,7 @@ static void tcp_listen(struct pkbuf *pkb, struct tcp_segment *seg,
 	struct tcp_sock *newtsk;
 	struct tcp *tcphdr = seg->tcphdr;
 	tcpsdbg("LISTEN");
+
 	/* first check for an RST */
 	tcpsdbg("1. check rst");
 	if (tcphdr->rst)
@@ -88,6 +93,7 @@ static void tcp_listen(struct pkbuf *pkb, struct tcp_segment *seg,
 		tcp_send_reset(tsk, seg);
 		goto discarded;
 	}
+
 	/* third check for a SYN (security check is ignored) */
 	tcpsdbg("3. check syn");
 	/* RFC 2873: ignore the security/compartment check */
@@ -105,6 +111,7 @@ static void tcp_listen(struct pkbuf *pkb, struct tcp_segment *seg,
 		tcpsdbg("cannot alloc new sock");
 		goto discarded;
 	}
+
 	newtsk->irs = seg->seq;
 	newtsk->iss = alloc_new_iss();
 	newtsk->rcv_nxt = seg->seq + 1;;
@@ -167,6 +174,7 @@ static void tcp_synsent(struct pkbuf *pkb, struct tcp_segment *seg,
 		 *   (Assert SND.UNA == 0)
 		 */
 	}
+
 	/* second check the RST bit */
 	tcpsdbg("2. check rst");
 	if (tcphdr->rst) {
@@ -235,9 +243,11 @@ static int tcp_synrecv_ack(struct tcp_sock *tsk)
 		return -1;
 	if (tcp_accept_queue_full(tsk->parent))
 		return -1;
+
 	tcp_accept_enqueue(tsk);
 	tcpsdbg("Passive three-way handshake successes!");
 	wake_up(tsk->parent->wait_accept);
+
 	return 0;
 }
 
@@ -286,6 +296,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 	struct tcp_sock *tsk = tcpsk(sk);
 	struct tcp *tcphdr = seg->tcphdr;
 	tcp_dbg_state(tsk);
+
 	if (!tsk || tsk->state == TCP_CLOSED)
 		return tcp_closed(tsk, pkb, seg);
 	if (tsk->state == TCP_LISTEN)
@@ -294,6 +305,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 		return tcp_synsent(pkb, seg, tsk);
 	if (tsk->state >= TCP_MAX_STATE)
 		goto drop;
+
 	/* first check sequence number */
 	tcpsdbg("1. check seq");
 	if (seq_check(seg, tsk) < 0) {
@@ -302,6 +314,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 			tsk->flags |= TCP_F_ACKNOW; /*reply ACK seq=snd.nxt, ack=rcv.nxt*/
 		goto drop;
 	}
+
 	/* second check the RST bit */
 	tcpsdbg("2. check rst");
 	if (tcphdr->rst) {
@@ -338,6 +351,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 		tcp_unbhash(tsk);
 		goto drop;
 	}
+
 	/* third check security and precedence (ignored) */
 	tcpsdbg("3. NO check security and precedence");
 	/* fourth check the SYN bit */
@@ -361,6 +375,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 		tcp_set_state(tsk, TCP_CLOSED);
 		free_sock(&tsk->sk);
 	}
+
 	/* fifth check the ACK field */
 	tcpsdbg("5. check ack");
 	/*
@@ -505,6 +520,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 			break;
 		}
 	}
+
 	/* seventh process the segment text */
 	tcpsdbg("7. segment text");
 	switch (tsk->state) {
@@ -521,6 +537,7 @@ void tcp_process(struct pkbuf *pkb, struct tcp_segment *seg, struct sock *sk)
 	 * OTHER STATES: segment is ignored!
 	 */
 	}
+
 	/* eighth check the FIN bit */
 	tcpsdbg("8. check fin");
 	if (tcphdr->fin) {

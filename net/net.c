@@ -1,6 +1,7 @@
 /*
  * special net device independent L2 code
  */
+
 #include <net/if.h>
 #include <linux/in.h>
 #include <linux/socket.h>
@@ -22,6 +23,7 @@ static struct ether *eth_init(struct netdev *dev, struct pkbuf *pkb)
 		dbg("received packet is too small:%d bytes", pkb->pk_len);
 		return NULL;
 	}
+
 	/* hardware address type */
 	if (is_eth_multicast(ehdr->eth_dst)) {
 		if (is_eth_broadcast(ehdr->eth_dst))
@@ -33,8 +35,10 @@ static struct ether *eth_init(struct netdev *dev, struct pkbuf *pkb)
 	} else {
 			pkb->pk_type = PKT_OTHERHOST;
 	}
+
 	/* packet protocol */
 	pkb->pk_pro = _ntohs(ehdr->eth_pro);
+
 	return ehdr;
 }
 
@@ -44,6 +48,7 @@ void net_in(struct netdev *dev, struct pkbuf *pkb)
 	struct ether *ehdr = eth_init(dev, pkb);
 	if (!ehdr)
 		return;
+
 	l2dbg(MACFMT " -> " MACFMT "(%s)",
 				macfmt(ehdr->eth_src),
 				macfmt(ehdr->eth_dst),
@@ -51,7 +56,6 @@ void net_in(struct netdev *dev, struct pkbuf *pkb)
 	pkb->pk_indev = dev;
 	switch (pkb->pk_pro) {
 	case ETH_P_RARP:
-//		rarp_in(dev, pkb);
 		break;
 	case ETH_P_ARP:
 		arp_in(dev, pkb);

@@ -14,6 +14,7 @@ static void udp_recv(struct pkbuf *pkb, struct ip *iphdr, struct udp *udphdr)
 		icmp_send(ICMP_T_DESTUNREACH, ICMP_PORT_UNREACH, 0, pkb);
 		goto drop;
 	}
+
 	/* FIFO receive queue */
 	list_add_tail(&pkb->pk_list, &sk->recv_queue);
 	sk->ops->recv_notify(sk);
@@ -34,9 +35,11 @@ void udp_in(struct pkbuf *pkb)
 		udpdbg("udp length is too small");
 		goto drop_pkb;
 	}
+
 	/* Maybe ip data has pad bytes. */
 	if (udplen > _ntohs(udphdr->length))
 		udplen = _ntohs(udphdr->length);
+
 	if (udphdr->checksum && udp_chksum(iphdr->ip_src, iphdr->ip_dst,
 				udplen, (unsigned short *)udphdr) != 0) {
 		udpdbg("udp packet checksum corrupts");

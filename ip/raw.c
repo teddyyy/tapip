@@ -18,6 +18,7 @@ void raw_in(struct pkbuf *pkb)
 	struct ip *iphdr = pkb2ip(pkb);
 	struct pkbuf *rawpkb;
 	struct sock *sk;
+
 	/* FIXME: lock for raw lookup */
 	sk = raw_lookup_sock(iphdr->ip_src, iphdr->ip_dst, iphdr->ip_pro);
 	while (sk) {

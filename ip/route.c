@@ -18,6 +18,7 @@ struct rtentry *rt_lookup(unsigned int ipaddr)
 			(rt->rt_netmask & rt->rt_net))
 			return rt;
 	}
+
 	return NULL;
 }
 
@@ -33,6 +34,7 @@ struct rtentry *rt_alloc(unsigned int net, unsigned int netmask,
 	rt->rt_flags = flags;
 	rt->rt_dev = dev;
 	list_init(&rt->rt_list);
+
 	return rt;
 }
 
@@ -94,6 +96,7 @@ int rt_input(struct pkbuf *pkb)
 		return -1;
 	}
 	pkb->pk_rtdst = rt;
+
 	return 0;
 }
 
@@ -111,6 +114,7 @@ int rt_output(struct pkbuf *pkb)
 	iphdr->ip_src = rt->rt_dev->net_ipaddr;
 	ipdbg("Find route entry from "IPFMT" to "IPFMT,
 			ipfmt(iphdr->ip_src), ipfmt(iphdr->ip_dst));
+
 	return 0;
 }
 

@@ -3,6 +3,7 @@
  *  Although the code is clean and simple,
  *  the culculation is complex (CBUFHEADRIGHT).
  */
+
 #include "lib.h"
 #include "cbuf.h"
 
@@ -30,6 +31,7 @@ int write_cbuf(struct cbuf *cbuf, char *buf, int size)
 	int len , wlen, onelen;
 	if (!cbuf)
 		return 0;
+
 	len = wlen = min(CBUFFREE(cbuf), size);
 	while (len > 0) {
 		onelen = min(CBUFHEADRIGHT(cbuf), len);
@@ -41,6 +43,7 @@ int write_cbuf(struct cbuf *cbuf, char *buf, int size)
 		len -= onelen;
 		cbuf->head += onelen;
 	}
+
 	return wlen;
 }
 
@@ -49,6 +52,7 @@ int read_cbuf(struct cbuf *cbuf, char *buf, int size)
 	int len , rlen , onelen;
 	if (!cbuf)
 		return 0;
+
 	len = rlen = min(CBUFUSED(cbuf), size);
 	while (len > 0) {
 		onelen = min(CBUFTAILRIGHT(cbuf), len);
@@ -60,11 +64,13 @@ int read_cbuf(struct cbuf *cbuf, char *buf, int size)
 		len -= onelen;
 		cbuf->tail += onelen;
 	}
+
 	/* update I/O point */
 	if (cbuf->tail >= cbuf->size) {
 		cbuf->head -= cbuf->size;
 		cbuf->tail -= cbuf->size;
 	}
+
 	return rlen;
 }
 
@@ -98,6 +104,7 @@ int main(void)
 			die("read_cbuf");
 		n--;
 	}
+
 	free_cbuf(cbuf);
 	dbg("1 byte cbuf is ok!");
 
@@ -142,6 +149,7 @@ int main(void)
 			i--;
 		}
 	}
+
 	free_cbuf(cbuf);
 	dbg("9999 byte cbuf is ok!");
 

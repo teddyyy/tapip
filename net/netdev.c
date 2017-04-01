@@ -2,6 +2,7 @@
  *  Lowest net device code:
  *    independent net device layer
  */
+
 #include "netif.h"
 #include "ether.h"
 #include "lib.h"
@@ -30,6 +31,7 @@ struct netdev *netdev_alloc(char *devstr, struct netdev_ops *netops)
 	dev->net_ops = netops;
 	if (netops && netops->init)
 		netops->init(dev);
+
 	return dev;
 }
 
@@ -38,6 +40,7 @@ void netdev_free(struct netdev *dev)
 	if (dev->net_ops && dev->net_ops->exit)
 		dev->net_ops->exit(dev);
 	list_del(&dev->net_list);
+
 	free(dev);
 }
 
@@ -92,13 +95,16 @@ int local_address(unsigned int addr)
 	/* wildchar */
 	if (!addr)
 		return 1;
+
 	/* loop back address */
 	if (LOCALNET(loop) == (loop->net_mask & addr))
 		return 1;
+
 	/* nic bind address */
 	list_for_each_entry(dev, &net_devices, net_list) {
 		if (dev->net_ipaddr == addr)
 			return 1;
 	}
+
 	return 0;
 }

@@ -13,6 +13,7 @@ static struct sock *tcp_lookup_sock_establish(unsigned int src, unsigned int dst
 	struct hlist_head *head;
 	struct hlist_node *node;
 	struct sock *sk;
+
 	head = tcp_ehash_head(tcp_ehashfn(src, dst, src_port, dst_port));
 	hlist_for_each_sock(sk, node, head) {
 		if (sk->sk_saddr == dst &&
@@ -21,6 +22,7 @@ static struct sock *tcp_lookup_sock_establish(unsigned int src, unsigned int dst
 			sk->sk_dport == src_port)
 			return get_sock(sk);
 	}
+
 	return NULL;
 }
 
@@ -35,6 +37,7 @@ static struct sock *tcp_lookup_sock_listen(unsigned int addr, unsigned int nport
 			sk->sk_sport == nport)
 			return get_sock(sk);
 	}
+
 	return NULL;
 }
 
@@ -46,6 +49,7 @@ struct sock *tcp_lookup_sock(unsigned int src, unsigned int dst,
 	sk = tcp_lookup_sock_establish(src, dst, src_port, dst_port);
 	if (!sk)
 		sk = tcp_lookup_sock_listen(dst, dst_port);
+
 	return sk;
 }
 
@@ -56,6 +60,7 @@ static _inline int __tcp_port_used(unsigned short nport, struct hlist_head *head
 	for_each_tcp_sock(tsk, node, head)
 		if (tsk->sk.sk_sport == nport)
 			return 1;
+
 	return 0;
 }
 
@@ -72,14 +77,17 @@ static unsigned short tcp_get_port(void)
 	/* no free bind port resource */
 	if (tcp_table.bfree <= 0)
 		return 0;
+
 	/* assert that we can break the loop */
 	while (tcp_port_used(_htons(defport))) {
 		if (++defport > TCP_BPORT_MAX)
 			defport = TCP_BPORT_MIN;
 	}
+
 	nport = _htons(defport);
 	if (++defport > TCP_BPORT_MAX)
 		defport = TCP_BPORT_MIN;
+
 	return nport;
 }
 
@@ -142,7 +150,9 @@ int tcp_hash(struct sock *sk)
 			return -1;
 		sk->hash = hash;
 	}
+
 	sock_add_hash(sk, head);
+
 	return 0;
 }
 
@@ -171,6 +181,7 @@ static int tcp_connect(struct sock *sk, struct sock_addr *skaddr)
 	int err;
 	if (tsk->state != TCP_CLOSED)
 		return -1;
+
 	sk->sk_daddr = skaddr->dst_addr;
 	sk->sk_dport = skaddr->dst_port;
 	/* three-way handshake starts, send first SYN */
@@ -178,10 +189,12 @@ static int tcp_connect(struct sock *sk, struct sock_addr *skaddr)
 	tsk->iss = alloc_new_iss();
 	tsk->snd_una = tsk->iss;
 	tsk->snd_nxt = tsk->iss + 1;
+
 	if (tcp_hash(sk) < 0) {
 		tsk->state = TCP_CLOSED;
 		return -1;
 	}
+
 	/*
 	 * Race condition:
 	 *  If we connect to localhost, then we will send syn
@@ -200,6 +213,7 @@ static int tcp_connect(struct sock *sk, struct sock_addr *skaddr)
 		tsk->state = TCP_CLOSED;
 		err = -1;
 	}
+
 	return err;
 }
 
@@ -207,17 +221,20 @@ static int tcp_listen(struct sock *sk, int backlog)
 {
 	struct tcp_sock *tsk = tcpsk(sk);
 	unsigned int oldstate = tsk->state;
+
 	if (!sk->sk_sport)	/* no bind */
 		return -1;
 	if (backlog > TCP_MAX_BACKLOG)
 		return -1;
 	if (oldstate != TCP_CLOSED && oldstate != TCP_LISTEN)
 		return -1;
+
 	tsk->backlog = backlog;
 	tsk->state = TCP_LISTEN;
 	/* add tcpsk into listen hash table */
 	if (oldstate != TCP_LISTEN && sk->ops->hash)
 		sk->ops->hash(sk);
+
 	return 0;
 }
 
@@ -227,6 +244,7 @@ static int tcp_wait_accept(struct tcp_sock *tsk)
 	tsk->wait_accept = &tsk->sk.sock->sleep;
 	err = sleep_on(tsk->wait_accept);
 	tsk->wait_accept = NULL;
+
 	return err;
 }
 
@@ -248,6 +266,7 @@ static struct sock *tcp_accept(struct sock *sk)
 		if (tcp_wait_accept(tsk) < 0)
 			goto out;
 	}
+
 	newtsk = tcp_accept_dequeue(tsk);
 	free_sock(&newtsk->sk);
 	/* disassociate it with parent */
@@ -302,8 +321,10 @@ static int tcp_close(struct sock *sk)
 		tsk->snd_nxt++;
 		break;
 	}
+
 	tcp_free_buf(tsk);
 	tcp_free_reass_head(tsk);
+
 	return 0;
 }
 
