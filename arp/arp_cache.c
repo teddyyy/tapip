@@ -86,12 +86,14 @@ struct arpentry *arp_alloc(void)
 			break;
 		next = (next + 1) % ARP_CACHE_SZ;
 	}
+
 	/* not found */
 	if (i >= ARP_CACHE_SZ) {
 		arpdbg("arp cache is full");
 		arp_cache_unlock();
 		return NULL;
 	}
+
 	/* init */
 	ae = &arp_cache[next];
 	ae->ae_dev = NULL;
@@ -100,6 +102,7 @@ struct arpentry *arp_alloc(void)
 	ae->ae_state = ARP_WAITING;
 	ae->ae_pro = ETH_P_IP;		/* default protocol */
 	list_init(&ae->ae_list);
+
 	/* for next time allocation */
 	next = (next + 1) % ARP_CACHE_SZ;
 	arp_cache_unlock();
@@ -114,12 +117,14 @@ int arp_insert(struct netdev *nd, unsigned short pro,
 	ae = arp_alloc();
 	if (!ae)
 		return -1;
+
 	ae->ae_dev = nd;
 	ae->ae_pro = pro;
 	ae->ae_ttl = ARP_TIMEOUT;
 	ae->ae_ipaddr = ipaddr;
 	ae->ae_state = ARP_RESOLVED;
 	hwacpy(ae->ae_hwaddr, hwaddr);
+
 	return 0;
 }
 
@@ -128,6 +133,7 @@ struct arpentry *arp_lookup(unsigned short pro, unsigned int ipaddr)
 	struct arpentry *ae, *ret = NULL;
 	arp_cache_lock();
 	arpdbg("pro:%d "IPFMT, pro, ipfmt(ipaddr));
+
 	for (ae = arp_cache_head; ae < arp_cache_end; ae++) {
 		if (ae->ae_state == ARP_FREE)
 			continue;
@@ -136,6 +142,7 @@ struct arpentry *arp_lookup(unsigned short pro, unsigned int ipaddr)
 			break;
 		}
 	}
+
 	arp_cache_unlock();
 	return ret;
 }
@@ -146,6 +153,7 @@ struct arpentry *arp_lookup_resolv(unsigned short pro, unsigned int ipaddr)
 	ae = arp_lookup(pro, ipaddr);
 	if (ae && ae->ae_pro == ARP_RESOLVED)
 		return ae;
+
 	return NULL;
 }
 
@@ -202,6 +210,7 @@ char *ipnfmt(unsigned int ipaddr)
 {
 	static char ipbuf[16];
 	snprintf(ipbuf, 16, IPFMT, ipfmt(ipaddr));
+
 	return ipbuf;
 }
 

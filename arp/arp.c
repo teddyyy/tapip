@@ -14,12 +14,14 @@ void arp_request(struct arpentry *ae)
 	pkb = alloc_pkb(ETH_HRD_SZ + ARP_HRD_SZ);
 	ehdr = (struct ether *)pkb->pk_data;
 	ahdr = (struct arp *)ehdr->eth_data;
+
 	/* normal arp information */
 	ahdr->arp_hrd = _htons(ARP_HRD_ETHER);
 	ahdr->arp_pro = _htons(ETH_P_IP);
 	ahdr->arp_hrdlen = ETH_ALEN;
 	ahdr->arp_prolen = IP_ALEN;
 	ahdr->arp_op = _htons(ARP_OP_REQUEST);
+
 	/* address */
 	ahdr->arp_sip = ae->ae_dev->net_ipaddr;
 	hwacpy(ahdr->arp_sha, ae->ae_dev->net_hwaddr);
@@ -38,6 +40,7 @@ void arp_reply(struct netdev *dev, struct pkbuf *pkb)
 	struct ether *ehdr = (struct ether *)pkb->pk_data;
 	struct arp *ahdr = (struct arp *)ehdr->eth_data;
 	arpdbg("replying arp request");
+
 	/* arp field */
 	ahdr->arp_op = ARP_OP_REPLY;
 	hwacpy(ahdr->arp_tha, ahdr->arp_sha);
@@ -45,6 +48,7 @@ void arp_reply(struct netdev *dev, struct pkbuf *pkb)
 	hwacpy(ahdr->arp_sha, dev->net_hwaddr);
 	ahdr->arp_sip = dev->net_ipaddr;
 	arp_ntoh(ahdr);
+
 	/* ether field */
 	netdev_tx(dev, pkb, ARP_HRD_SZ, ETH_P_ARP, ehdr->eth_src);
 }
@@ -115,6 +119,7 @@ void arp_in(struct netdev *dev, struct pkbuf *pkb)
 		arpdbg("error sender hardware address");
 		goto err_free_pkb;
 	}
+
 	arp_hton(ahdr);
 
 #if defined(ARP_ETHERNET) && defined(ARP_IP)
