@@ -1,3 +1,4 @@
 *.o
 tapip
 cbuf
+*.swp

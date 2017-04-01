@@ -23,8 +23,10 @@ struct netdev *netdev_alloc(char *devstr, struct netdev_ops *netops)
 {
 	struct netdev *dev;
 	dev = xzalloc(sizeof(*dev));
+
 	/* add into localhost net device list */
 	list_add_tail(&dev->net_list, &net_devices);
+
 	/* set name */
 	dev->net_name[NETDEV_NLEN - 1] = '\0';
 	strncpy((char *)dev->net_name, devstr, NETDEV_NLEN - 1);

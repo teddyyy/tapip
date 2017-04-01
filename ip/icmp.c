@@ -138,11 +138,13 @@ static void icmp_echo_request(struct icmp_desc *icmp_desc, struct pkbuf *pkb)
 			(int)(iphdr->ip_len - iphlen(iphdr) - ICMP_HRD_SZ),
 			_ntohs(icmphdr->icmp_id),
 			_ntohs(icmphdr->icmp_seq));
+
 	if (icmphdr->icmp_code) {
 		icmpdbg("echo request packet corrupted");
 		free_pkb(pkb);
 		return;
 	}
+
 	icmphdr->icmp_type = ICMP_T_ECHORLY;
 	/*
 	 * adjacent the checksum:
@@ -154,12 +156,15 @@ static void icmp_echo_request(struct icmp_desc *icmp_desc, struct pkbuf *pkb)
 		icmphdr->icmp_cksum += ICMP_T_ECHOREQ + 1;
 	else
 		icmphdr->icmp_cksum += ICMP_T_ECHOREQ;
+
 	iphdr->ip_dst = iphdr->ip_src;	/* ip_src is set by ip_send_out() */
 	ip_hton(iphdr);
+
 	/* init reused input packet */
 	pkb->pk_rtdst = NULL;
 	pkb->pk_indev = NULL;
 	pkb->pk_type = PKT_NONE;
+
 	ip_send_out(pkb);
 }
 
@@ -169,6 +174,7 @@ static void icmp_drop_reply(struct icmp_desc *icmp_desc, struct pkbuf *pkb)
 	struct icmp *icmphdr = ip2icmp(iphdr);
 	icmpdbg("icmp type %d code %d (dropped)",
 			icmphdr->icmp_type, icmphdr->icmp_code);
+
 	if (icmp_desc->info)
 		icmpdbg("%s", icmp_desc->info);
 	free_pkb(pkb);
@@ -179,6 +185,7 @@ void icmp_in(struct pkbuf *pkb)
 	struct ip *iphdr = pkb2ip(pkb);
 	struct icmp *icmphdr = ip2icmp(iphdr);
 	int icmplen, type;
+
 	/* sanity check */
 	icmplen = ipdlen(iphdr);
 	icmpdbg("%d bytes", icmplen);
