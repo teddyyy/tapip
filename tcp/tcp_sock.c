@@ -186,7 +186,7 @@ static int tcp_connect(struct sock *sk, struct sock_addr *skaddr)
 	sk->sk_dport = skaddr->dst_port;
 	/* three-way handshake starts, send first SYN */
 	tsk->state = TCP_SYN_SENT;
-	tsk->iss = alloc_new_iss();
+	tsk->iss = alloc_new_iss(sk);
 	tsk->snd_una = tsk->iss;
 	tsk->snd_nxt = tsk->iss + 1;
 
