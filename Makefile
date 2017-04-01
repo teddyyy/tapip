@@ -58,6 +58,7 @@ NET_STACK_OBJS =	shell/shell_obj.o	\
 			net/net_obj.o		\
 			arp/arp_obj.o		\
 			ip/ip_obj.o		\
+			ip6/ip6_obj.o		\
 			socket/socket_obj.o	\
 			udp/udp_obj.o		\
 			tcp/tcp_obj.o		\
@@ -77,6 +78,8 @@ arp/arp_obj.o:arp/*.c
 	@make -C arp/
 ip/ip_obj.o:ip/*.c
 	@make -C ip/
+ip6/ip6_obj.o:ip6/*.c
+	@make -C ip6/
 udp/udp_obj.o:udp/*.c
 	@make -C udp/
 tcp/tcp_obj.o:tcp/*.c

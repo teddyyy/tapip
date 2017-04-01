@@ -5,6 +5,8 @@
 #define LOOPBACK_MTU		1500
 #define LOOPBACK_IPADDR		0x0100007F	/* 127.0.0.1 */
 #define LOOPBACK_NETMASK	0x000000FF	/* 255.0.0.0 */
+#define LOOPBACK_IP6ADDR	"::1"
+#define LOOPBACK_NET6MASK	0x80		/* 128 */
 
 struct netdev *loop;
 
@@ -16,6 +18,12 @@ static int loop_dev_init(struct netdev *dev)
 	dev->net_mask = LOOPBACK_NETMASK;
 	dbg("%s ip address: " IPFMT, dev->net_name, ipfmt(dev->net_ipaddr));
 	dbg("%s netmask:    " IPFMT, dev->net_name, ipfmt(dev->net_mask));
+
+	struct in6_addr addr;
+	inet_pton(LOOPBACK_IP6ADDR, &addr);
+	dev->net_ip6addr = addr;
+	dev->net_6mask = LOOPBACK_NET6MASK;
+
 	/* net stats have been zero */
 	return 0;
 }
