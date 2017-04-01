@@ -135,9 +135,11 @@ void gethwaddr_tap(int tapfd, unsigned char *ha)
 {
 	struct ifreq ifr;
 	memset(&ifr, 0x0, sizeof(ifr));
+
 	/* get net order hardware address */
 	if (ioctl(tapfd, SIOCGIFHWADDR, (void *)&ifr) < 0)
 		perrx("ioctl SIOCGIFHWADDR");
+
 	hwacpy(ha, ifr.ifr_hwaddr.sa_data);
 	dbg("mac addr: %02x:%02x:%02x:%02x:%02x:%02x",
 			ha[0], ha[1], ha[2], ha[3], ha[4], ha[5]);
@@ -158,6 +160,7 @@ int alloc_tap(char *dev)
 	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
 	if (*dev)
 		strncpy(ifr.ifr_name, dev, IFNAMSIZ);
+
 	/*
 	 * create a new tap device
 	 * if created already, just bind tun with file

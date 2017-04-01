@@ -18,10 +18,12 @@ static int tap_dev_init(void)
 {
 	tap = xmalloc(sizeof(*tap));
 	tap->fd = alloc_tap("tap0");
+
 	if (tap->fd < 0)
 		goto free_tap;
 	if (setpersist_tap(tap->fd) < 0)
 		goto close_tap;
+
 	/* set tap information */
 	set_tap();
 	getname_tap(tap->fd, tap->dev.net_name);
@@ -33,6 +35,7 @@ static int tap_dev_init(void)
 	setnetmask_tap(tap->dev.net_name, FAKE_TAP_NETMASK);
 	setup_tap(tap->dev.net_name);
 #endif
+
 	unset_tap();
 	/* Dont add tap device into local net device list */
 	list_init(&tap->dev.net_list);
@@ -62,9 +65,10 @@ static int veth_dev_init(struct netdev *dev)
 	dev->net_mtu = tap->dev.net_mtu;
 	dev->net_ipaddr = FAKE_IPADDR;
 	dev->net_mask = FAKE_NETMASK;
-	hwacpy(dev->net_hwaddr, FAKE_HWADDR);
+	gen_eth_random_addr(dev->net_hwaddr, sizeof(dev->net_hwaddr));
 	dbg("%s ip address: " IPFMT, dev->net_name, ipfmt(dev->net_ipaddr));
 	dbg("%s hw address: " MACFMT, dev->net_name, macfmt(dev->net_hwaddr));
+
 	/* net stats have been zero */
 	return 0;
 }

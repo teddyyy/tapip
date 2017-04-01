@@ -2,6 +2,9 @@
 #define __ETHER_H
 
 #include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #define ETH_HRD_SZ	sizeof(struct ether)
 #define ETH_ALEN	6	/* ether address len */
@@ -59,6 +62,33 @@ static inline int is_eth_broadcast(unsigned char *hwa)
 	 * ethernet mac broadcast is FF:FF:FF:FF:FF:FF
 	 */
 	return (hwa[0] & hwa[1] & hwa[2] & hwa[3] & hwa[4] & hwa[5]) == 0xff;
+}
+
+static inline void gen_eth_random_addr(unsigned char *hwa, unsigned char hwalen)
+{
+	int fp;
+	unsigned char i = 0;
+
+	do {
+
+		if ((hwa == NULL) || (hwalen <= 0))
+			break;
+
+		fp = open("/dev/urandom", O_RDONLY);
+
+		while(i < hwalen) {
+			read(fp, &hwa[i], sizeof(hwa[i]));
+			if (hwa[i] <= 0xF)
+				continue;
+			i++;
+		}
+		close(fp);
+
+	} while(0);
+
+	hwa[0] &= 0xfe;
+	hwa[0] |= 0x02;
+
 }
 
 #endif	/* ether.h */
