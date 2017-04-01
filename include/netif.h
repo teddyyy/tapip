@@ -6,7 +6,7 @@
 
 #include "compile.h"
 #include "list.h"
-//#include "sock.h"
+#include "ip6.h"
 
 struct pkbuf;
 struct netdev;
@@ -32,6 +32,8 @@ struct netdev {
 	int net_mtu;
 	unsigned int net_ipaddr;		/* dev binding ip address */
 	unsigned int net_mask;			/* netmask */
+	struct in6_addr net_ip6addr;		/* dev binding ipv6 address */
+	unsigned int net_6mask;			/* ipv6 netmask */
 	unsigned char net_hwaddr[NETDEV_ALEN];	/* hardware address */
 	unsigned char net_name[NETDEV_NLEN];	/* device name */
 	struct netdev_ops *net_ops;		/* Nic Operation */
