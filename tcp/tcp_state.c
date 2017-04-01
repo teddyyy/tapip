@@ -1,10 +1,13 @@
 /*
  * TCP state machine based on RFC 793 #SEGMENT ARRIVE
  */
+
 #include "lib.h"
 #include "netif.h"
 #include "tcp.h"
 #include "ip.h"
+
+#define	MD5_WORDS	4
 
 const char *tcp_state_string[TCP_MAX_STATE] = {
 	"Unknown tcp state: 0",
@@ -36,13 +39,26 @@ static _inline void tcp_dbg_state(struct tcp_sock *tsk)
  * FIXME: this is a temp method for allocating SND.ISS
  *        See RFC 793/1122 to implement standard algorithm
  */
-unsigned int alloc_new_iss(void)
+unsigned int alloc_new_iss(struct sock *sk)
 {
-	static unsigned int iss = 12345678;
-	if (++iss >= 0xffffffff)
-		iss = 12345678;
+	unsigned int hash[MD5_WORDS];
+	unsigned int net_secret, ret;
+	struct sock *sock = sk;
 
-	return iss;
+	srand((unsigned int)time(NULL));
+	net_secret = rand();
+
+	hash[0] = sock->sk_saddr;
+	hash[1] = sock->sk_daddr;
+	hash[2] = (sock->sk_sport << 16) + sock->sk_dport;
+	hash[3] = net_secret;
+
+	md5_transform(hash, &net_secret);
+
+	ret = hash[0] + (unsigned int)(time(NULL) >> 6);
+	tcpsdbg("%d", ret);
+
+	return ret;
 }
 
 static struct tcp_sock *tcp_listen_child_sock(struct tcp_sock *tsk,
@@ -113,7 +129,7 @@ static void tcp_listen(struct pkbuf *pkb, struct tcp_segment *seg,
 	}
 
 	newtsk->irs = seg->seq;
-	newtsk->iss = alloc_new_iss();
+	newtsk->iss = alloc_new_iss(&newtsk->sk);
 	newtsk->rcv_nxt = seg->seq + 1;;
 	/* send seq=iss, ack=rcv.nxt, syn|ack */
 	tcp_send_synack(newtsk, seg);

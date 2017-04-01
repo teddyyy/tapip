@@ -124,5 +124,6 @@ struct tcp;
 extern void udp_set_checksum(struct ip *, struct udp *);
 extern void tcp_set_checksum(struct ip *, struct tcp *);
 extern void ip_set_checksum(struct ip *);
+extern void md5_transform(unsigned int *buf, unsigned int const *in);
 
 #endif	/* lib.h */

@@ -168,7 +168,7 @@ extern void tcp_segment_reass(struct tcp_sock *, struct tcp_segment *, struct pk
 extern void tcp_send_out(struct tcp_sock *, struct pkbuf *, struct tcp_segment *);
 extern int tcp_send_text(struct tcp_sock *, void *, int);
 
-extern unsigned int alloc_new_iss(void);
+extern unsigned int alloc_new_iss(struct sock *sk);
 extern int tcp_id;
 extern const char *tcp_state_string[];
 
