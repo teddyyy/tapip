@@ -1,40 +1,77 @@
 #include "netif.h"
+#include "lib.h"
 #include "ip6.h"
 
 int inet_pton(const char *src, void *dst)
 {
-	struct in6_addr *d = (struct in6_addr *)dst;
-	int colons = 0, dcolons = 0;
-	int i;
-	const char *p;
+	unsigned short int ip[8];
+	unsigned char *p = dst;
+	int i, j, v, d, brk =- 1;
 
-	for (p = dst; *p; p++) {
-		if (p[0] == ':') {
-			colons++;
-			if (p[1] == ':') 
-				dcolons++;
-		} else if (!_isxdigit(*p))
-				return 0;	// Invalid address
-	}
+	if (*src == ':' && *++src != ':')
+		return 0;
 
-	if (colons > 7 || dcolons > 1
-		|| (!dcolons && colons != 7))
-			return 0;	// Invalid address
+	for (i = 0; ; i++) {
+		if (src[0] == ':' && brk < 0) {
+			brk = i;
+			ip[i&7] = 0;
 
-	memset(d, 0, sizeof(struct in6_addr));
+			if (!*++src) break;
+			if (i == 7)  return 0;
 
-	i = 0;
-	for (p = dst; *p; p++) {
-		if (*p == ':') {
-			if (p[1] == ':') 
-				i += (8 - colons);
-			else
-				i++;
-		} else {
-			d->s6_addr16[i] = _htons((_ntohs(d->s6_addr16[i]) << 4) + hexval(*p));
+			continue;
 		}
+
+		for (v = j = 0; j < 4 && (d = hexval(src[j])) >= 0; j++)
+			v = 16 * v + d;
+
+		if (j == 0) return 0;
+
+		ip[i&7] = v;
+		if (!src[j] && (brk >= 0 || i == 7)) break;
+		if (i == 7) return 0;
+
+		if (src[j] != ':') {
+			if (src[j] != '.' || (i < 6 && brk < 0))
+				return 0;
+			i++;
+			break;
+		}
+		src += j + 1;
 	}
-	
+
+	if (brk >= 0) {
+		memmove(ip + brk + 7 - i, ip + brk, 2 *(i + 1 - brk));
+		for (j = 0; j < 7 - i; j++)
+			ip[brk + j] = 0;
+	}
+
+	for (j = 0; j < 8; j++) {
+		*p++ = ip[j] >> 8;
+		*p++ = ip[j];
+	}
+
 	return 1;
 }
-			
+
+const char *inet_ntop(const void *cp, char *buf, size_t len)
+{
+	size_t xlen;
+
+	const struct in6_addr *s = (const struct in6_addr *)cp;
+
+	xlen = snprintf(buf, len, "%x:%x:%x:%x:%x:%x:%x:%x",
+			_ntohs(s->s6_addr16[0]),
+			_ntohs(s->s6_addr16[1]),
+			_ntohs(s->s6_addr16[2]),
+			_ntohs(s->s6_addr16[3]),
+			_ntohs(s->s6_addr16[4]),
+			_ntohs(s->s6_addr16[5]),
+			_ntohs(s->s6_addr16[6]),
+			_ntohs(s->s6_addr16[7]));
+
+	if (xlen > len)
+		return NULL;
+
+	return buf;
+}

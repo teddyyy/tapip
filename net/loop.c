@@ -12,6 +12,9 @@ struct netdev *loop;
 
 static int loop_dev_init(struct netdev *dev)
 {
+	struct in6_addr a6;
+	char straddr[INET6_ADDRSTRLEN];
+
 	/* init veth: information for our netstack */
 	dev->net_mtu = LOOPBACK_MTU;
 	dev->net_ipaddr = LOOPBACK_IPADDR;
@@ -19,10 +22,13 @@ static int loop_dev_init(struct netdev *dev)
 	dbg("%s ip address: " IPFMT, dev->net_name, ipfmt(dev->net_ipaddr));
 	dbg("%s netmask:    " IPFMT, dev->net_name, ipfmt(dev->net_mask));
 
-	struct in6_addr addr;
-	inet_pton(LOOPBACK_IP6ADDR, &addr);
-	dev->net_ip6addr = addr;
+	if (inet_pton(LOOPBACK_IP6ADDR, &a6) <= 0)
+		perrx("IPv6 address format is somthing wrong");
+
+	dev->net_ip6addr = a6;
 	dev->net_6mask = LOOPBACK_NET6MASK;
+	inet_ntop(&dev->net_ip6addr, straddr, sizeof(straddr));
+	dbg("%s ipv6 address: %s/%d", dev->net_name, straddr, dev->net_6mask);
 
 	/* net stats have been zero */
 	return 0;

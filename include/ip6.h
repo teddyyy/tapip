@@ -1,8 +1,11 @@
 #ifndef __IP6_H
 #define __IP6_H
 
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+
+#define INET6_ADDRSTRLEN	46
 
 struct in6_addr {
 	union {
@@ -24,21 +27,22 @@ static inline int _isxdigit(int ch)
 	if (ch >= 'a' && ch <= 'f')
 		return true;
 
-	return (ch >= 'A') && (ch <= 'F');
+	if (ch >= 'A' && ch <= 'F')
+		return true;
+
+	return 0;
 }
 
-static inline int hexval(int ch)
+static inline int hexval(unsigned ch)
 {
-	if (ch >= '0' && ch <= '9')
-		return ch - '0';
-	else if (ch >= 'A' && ch <= 'F')
-		return ch - 'A' + 10;
-	else if (ch >= 'a' && ch <= 'f')
-		return ch - 'a' + 10;
-	else
-		return -1;
+	if (ch - '0' < 10) return ch - '0';
+	ch |= 32;
+	if (ch - 'a' < 6) return ch - 'a' + 10;
+
+	return -1;
 }
 
 extern int inet_pton(const char *src, void *dst);
+extern const char *inet_ntop(const void *cp, char *buf, size_t len);
 
 #endif	/* ip */
