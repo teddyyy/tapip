@@ -103,12 +103,16 @@ void ifinfo(struct netdev *dev)
 {
 	printf("%-10sHWaddr "MACFMT"\n"
 		"          IPaddr "IPFMT"\n"
+		"          IPv6addr %s/%d\n"
 		"          mtu %d\n"
 		"          RX packet:%u bytes:%u errors:%u\n"
-		"          TX packet:%u bytes:%u errors:%u\n",
+		"          TX packet:%u bytes:%u errors:%u\n"
+		"\n",
 		dev->net_name,
 		macfmt(dev->net_hwaddr),
 		ipfmt(dev->net_ipaddr),
+		ip6fmt(&dev->net_ip6addr),
+		dev->net_6mask,
 		dev->net_mtu,
 		dev->net_stats.rx_packets,
 		dev->net_stats.rx_bytes,

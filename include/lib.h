@@ -111,6 +111,7 @@ extern void perrx(char *str);
 extern int str2ip(char *str, unsigned int *ip);
 extern void printfs(int mlen, const char *fmt, ...);
 extern int parse_ip_port(char *, unsigned int *, unsigned short *);
+extern char *ip6fmt(const void *cp);
 
 extern unsigned short ip_chksum(unsigned short *data, int size);
 extern unsigned short icmp_chksum(unsigned short *data, int size);
