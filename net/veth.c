@@ -57,6 +57,9 @@ static void veth_dev_exit(struct netdev *dev)
 
 static int veth_dev_init(struct netdev *dev)
 {
+	struct in6_addr a6;
+	char straddr[INET6_ADDRSTRLEN];
+
 	/* init tap: out network nic */
 	if (tap_dev_init() < 0)
 		perrx("Cannot init tap device");
@@ -68,6 +71,14 @@ static int veth_dev_init(struct netdev *dev)
 	gen_eth_random_addr(dev->net_hwaddr, sizeof(dev->net_hwaddr));
 	dbg("%s ip address: " IPFMT, dev->net_name, ipfmt(dev->net_ipaddr));
 	dbg("%s hw address: " MACFMT, dev->net_name, macfmt(dev->net_hwaddr));
+
+	if (inet_pton(FAKE_IPV6ADDR, &a6) <= 0)
+        perrx("IPv6 address format is somthing wrong");
+
+	dev->net_ip6addr = a6;
+	dev->net_6mask = FAKE_IPV6MASK;
+	inet_ntop(&dev->net_ip6addr, straddr, sizeof(straddr));
+	dbg("%s ipv6 address: %s/%d", dev->net_name, straddr, dev->net_6mask);
 
 	/* net stats have been zero */
 	return 0;

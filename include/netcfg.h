@@ -18,4 +18,7 @@
 #define FAKE_TAP_NETMASK 0x00ffffff	/* 255.255.255.0 */
 #define FAKE_NETMASK 0x00ffffff		/* 255.255.255.0 */
 
+#define	FAKE_IPV6ADDR	"2001:db8::1"	/* RFC3849 */
+#define	FAKE_IPV6MASK	64		/* RFC3849 */
+
 #endif	/* netcfg.h */
