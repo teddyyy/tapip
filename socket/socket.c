@@ -53,13 +53,15 @@ static struct socket *alloc_socket(int family, int type)
 struct socket *_socket(int family, int type, int protocol)
 {
 	struct socket *sock = NULL;
-	/* only support AF_INET */
-	if (family != AF_INET)
+	/* only support AF_INET & AF_INET6 */
+	if (family != AF_INET || family != AF_INET6)
 		goto out;
+
 	/* alloc new socket */
 	sock = alloc_socket(family, type);
 	if (!sock)
 		goto out;
+
 	/* only support AF_INET */
 	sock->ops = &inet_ops;
 	/* assert sock->ops->socket */
@@ -67,7 +69,8 @@ struct socket *_socket(int family, int type, int protocol)
 		free_socket(sock);
 		sock = NULL;
 	}
-	/* only support AF_INET */
+
+	/* only support AF_INET & AF_INET6 */
 out:
 	return sock;
 }

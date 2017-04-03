@@ -20,7 +20,8 @@ enum sock_type {
 };
 
 enum socket_family {
-	AF_INET = 1
+	AF_INET = 1,
+	AF_INET6
 };
 
 struct socket;
