@@ -4,7 +4,7 @@
 #include "socket.h"
 
 struct inet_type {
-	struct sock *(*alloc_sock)(int);
+	struct sock *(*alloc_sock)(int, int);
 	int type;
 	int protocol;
 };

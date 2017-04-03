@@ -39,19 +39,23 @@ static int inet_socket(struct socket *sock, int protocol)
 		return -1;
 
 	inet = &inet_type_table[type];
+
 	/* alloc sock and check protocol */
-	sk = inet->alloc_sock(protocol);
+	sk = inet->alloc_sock(sock->family, protocol);
 	if (!sk)	/* protocol error or other error */
 		return -1;
+
 	/* If wildchar protocol is allowed, we set protocol defaultly */
 	if (!protocol)
 		protocol = inet->protocol;
+
 	sock->sk = get_sock(sk);
 	/* RawIp uses it for filtering packet. */
 	list_init(&sk->recv_queue);
 	hlist_node_init(&sk->hash_list);
 	sk->protocol = protocol;
 	sk->sock = sock;
+
 	/* only used by raw ip */
 	if (sk->hash && sk->ops->hash)
 		sk->ops->hash(sk);

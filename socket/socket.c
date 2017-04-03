@@ -47,6 +47,7 @@ static struct socket *alloc_socket(int family, int type)
 	sock->type = type;
 	wait_init(&sock->sleep);
 	sock->refcnt = 1;
+
 	return sock;
 }
 
@@ -63,7 +64,9 @@ struct socket *_socket(int family, int type, int protocol)
 		goto out;
 
 	/* only support AF_INET */
-	sock->ops = &inet_ops;
+	if (sock->family == AF_INET)
+		sock->ops = &inet_ops;
+
 	/* assert sock->ops->socket */
 	if (sock->ops->socket(sock, protocol) < 0) {
 		free_socket(sock);
