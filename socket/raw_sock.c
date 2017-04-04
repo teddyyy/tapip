@@ -85,9 +85,11 @@ static struct sock_ops raw_ops = {
 struct sock *raw_alloc_sock(int protocol)
 {
 	struct raw_sock *raw_sk;
+
 	/* It cannot use wildchar protocol! */
 	if (protocol == IP_P_IP)
 		return NULL;
+
 	raw_sk = xzalloc(sizeof(*raw_sk));
 	alloc_socks++;
 	raw_sk->sk.ops = &raw_ops;

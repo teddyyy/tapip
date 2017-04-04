@@ -422,7 +422,6 @@ static void tcp_recv_notify(struct sock *sk)
 
 static struct sock_ops tcp_ops = {
 	.send_buf= tcp_send_buf,
-//	.send_pkb = tcp_send_pkb,
 	.recv_buf = tcp_recv_buf,
 	.recv_notify = tcp_recv_notify,
 	.listen = tcp_listen,
@@ -447,6 +446,7 @@ struct sock *tcp_alloc_sock(int protocol)
 	struct tcp_sock *tsk;
 	if (protocol && protocol != IP_P_TCP)
 		return NULL;
+
 	tsk = xzalloc(sizeof(*tsk));
 	alloc_socks++;
 	tsk->sk.ops = &tcp_ops;
@@ -458,6 +458,7 @@ struct sock *tcp_alloc_sock(int protocol)
 	list_init(&tsk->sk.recv_queue);
 	list_init(&tsk->rcv_reass);
 	tcp_id++;
+
 	return &tsk->sk;
 }
 

@@ -58,6 +58,7 @@ static void veth_dev_exit(struct netdev *dev)
 static int veth_dev_init(struct netdev *dev)
 {
 	struct in6_addr a6;
+	char straddr[INET6_ADDRSTRLEN];
 
 	/* init tap: out network nic */
 	if (tap_dev_init() < 0)
@@ -76,7 +77,9 @@ static int veth_dev_init(struct netdev *dev)
 
 	dev->net_ip6addr = a6;
 	dev->net_6mask = FAKE_IPV6MASK;
-	dbg("%s ipv6 address: %s/%d", dev->net_name, ip6fmt(&dev->net_ip6addr), dev->net_6mask);
+	dbg("%s ipv6 address: %s/%d", dev->net_name,
+		inet_ntop(&dev->net_ip6addr, straddr, sizeof(straddr)),
+		dev->net_6mask);
 
 	/* net stats have been zero */
 	return 0;
