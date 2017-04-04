@@ -16,7 +16,7 @@ extern struct sock *raw_lookup_sock(unsigned int, unsigned int, int);
 extern struct sock *raw_lookup_sock_next(struct sock *,
 			unsigned int, unsigned int, int);
 extern void raw_init(void);
-extern struct sock *raw_alloc_sock(int);
+extern struct sock *raw_alloc_sock(unsigned int, int);
 
 extern struct tapip_wait raw_send_wait;
 extern struct list_head raw_send_queue;

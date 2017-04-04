@@ -14,6 +14,13 @@ struct sock_addr {
 	unsigned short dst_port;
 } __attribute__((packed));
 
+struct sock6_addr {
+	struct in6_addr src_addr;
+	struct in6_addr dst_addr;
+	unsigned short src_port;	/* net order port */
+	unsigned short dst_port;
+} __attribute__((packed));
+
 struct sock;
 struct sock_ops {
 	void (*recv_notify)(struct sock *);
@@ -49,6 +56,12 @@ struct sock {
 	unsigned int hash;	/* hash num for sock hash table lookup */
 	struct hlist_node hash_list;
 	int refcnt;
+} __attribute__((packed));
+
+struct sock6 {
+	unsigned char protocol;
+	struct sock6_addr sk6_addr;
+	struct socket *sock;
 } __attribute__((packed));
 
 #define sk_saddr sk_addr.src_addr

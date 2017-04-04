@@ -28,7 +28,7 @@ static struct inet_type inet_type_table[SOCK_MAX] = {
 	}
 };
 
-static int inet_socket(struct socket *sock, int protocol)
+static int inet4_socket(struct socket *sock, int protocol)
 {
 	struct inet_type *inet;
 	struct sock *sk;
@@ -41,7 +41,7 @@ static int inet_socket(struct socket *sock, int protocol)
 	inet = &inet_type_table[type];
 
 	/* alloc sock and check protocol */
-	sk = inet->alloc_sock(protocol);
+	sk = inet->alloc_sock(sock->family, protocol);
 	if (!sk)	/* protocol error or other error */
 		return -1;
 
@@ -61,6 +61,21 @@ static int inet_socket(struct socket *sock, int protocol)
 		sk->ops->hash(sk);
 
 	return 0;
+}
+
+static int inet6_socket(struct socket *sock, int protocol)
+{
+	return 0;
+}
+
+static int inet_socket(struct socket *sock, int protocol)
+{
+	if (sock->family == AF_INET)
+		return inet4_socket(sock, protocol);
+	else if (sock->family == AF_INET6)
+		return inet6_socket(sock, protocol);
+
+	return -1;
 }
 
 static int inet_close(struct socket *sock)
@@ -242,6 +257,20 @@ struct socket_ops inet_ops = {
 	.send = inet_send,
 	.recv = inet_recv,
 };
+
+struct socket_ops inet6_ops = {
+    .socket = inet_socket,
+    .close = inet_close,
+    .listen = inet_listen,
+    .bind = inet_bind,
+    .accept = inet_accept,
+    .connect = inet_connect,
+    .read = inet_read,
+    .write = inet_write,
+    .send = inet_send,
+    .recv = inet_recv,
+};
+
 
 void inet_init(void)
 {

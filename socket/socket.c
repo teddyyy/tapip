@@ -66,6 +66,8 @@ struct socket *_socket(int family, int type, int protocol)
 	/* only support AF_INET */
 	if (sock->family == AF_INET)
 		sock->ops = &inet_ops;
+	else if (sock->family == AF_INET6)
+		sock->ops = &inet6_ops;
 
 	/* assert sock->ops->socket */
 	if (sock->ops->socket(sock, protocol) < 0) {

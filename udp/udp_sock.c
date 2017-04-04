@@ -333,7 +333,7 @@ void udp_init(void)
 	udp_id = 0;
 }
 
-struct sock *udp_alloc_sock(int protocol)
+struct sock *udp_alloc_sock(unsigned int family, int protocol)
 {
 	struct udp_sock *udp_sk;
 	if (protocol && protocol != IP_P_UDP)
