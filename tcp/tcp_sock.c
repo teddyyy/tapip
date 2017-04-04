@@ -441,7 +441,7 @@ struct tcp_sock *get_tcp_sock(struct tcp_sock *tsk)
 
 int tcp_id;
 
-struct sock *tcp_alloc_sock(int family, int protocol)
+struct sock *tcp_alloc_sock(int protocol)
 {
 	struct tcp_sock *tsk;
 	if (protocol && protocol != IP_P_TCP)

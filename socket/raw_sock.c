@@ -82,7 +82,7 @@ static struct sock_ops raw_ops = {
 	.close = sock_close,
 };
 
-struct sock *raw_alloc_sock(int family, int protocol)
+struct sock *raw_alloc_sock(int protocol)
 {
 	struct raw_sock *raw_sk;
 

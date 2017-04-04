@@ -8,7 +8,6 @@
 struct sock;
 struct raw_sock {
 	struct sock sk;
-	int family;
 	struct list_head list;		/* raw sock hash table node */
 };
 
@@ -17,7 +16,7 @@ extern struct sock *raw_lookup_sock(unsigned int, unsigned int, int);
 extern struct sock *raw_lookup_sock_next(struct sock *,
 			unsigned int, unsigned int, int);
 extern void raw_init(void);
-extern struct sock *raw_alloc_sock(int, int);
+extern struct sock *raw_alloc_sock(int);
 
 extern struct tapip_wait raw_send_wait;
 extern struct list_head raw_send_queue;

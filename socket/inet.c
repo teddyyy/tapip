@@ -41,7 +41,7 @@ static int inet_socket(struct socket *sock, int protocol)
 	inet = &inet_type_table[type];
 
 	/* alloc sock and check protocol */
-	sk = inet->alloc_sock(sock->family, protocol);
+	sk = inet->alloc_sock(protocol);
 	if (!sk)	/* protocol error or other error */
 		return -1;
 

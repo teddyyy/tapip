@@ -71,7 +71,6 @@ enum tcp_state {
 
 struct tcp_sock {
 	struct sock sk;
-	int family;
 	struct hlist_node bhash_list;	/* for bind hash table, e/lhash node is in sk */
 	unsigned int bhash;		/* bind hash value */
 	int accept_backlog;		/* current entries of accept queue */
@@ -150,7 +149,7 @@ static _inline struct tcp_sock *tcp_accept_dequeue(struct tcp_sock *tsk)
 extern void tcp_in(struct pkbuf *);
 extern struct sock *tcp_lookup_sock(unsigned int, unsigned int, unsigned int, unsigned int);
 extern void tcp_process(struct pkbuf *, struct tcp_segment *, struct sock *);
-extern struct sock *tcp_alloc_sock(int, int);
+extern struct sock *tcp_alloc_sock(int);
 extern int tcp_hash(struct sock *);
 extern void tcp_unhash(struct sock *);
 extern void tcp_unbhash(struct tcp_sock *);

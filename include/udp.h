@@ -13,7 +13,6 @@ struct udp {
 
 struct udp_sock {
 	struct sock sk;
-	int family;
 };
 
 #define UDP_HRD_SZ sizeof(struct udp)
@@ -24,6 +23,6 @@ struct udp_sock {
 extern struct sock *udp_lookup_sock(unsigned short port);
 extern void udp_in(struct pkbuf *pkb);
 extern void udp_init(void);
-extern struct sock *udp_alloc_sock(int family, int protocol);
+extern struct sock *udp_alloc_sock(int protocol);
 
 #endif	/* udp.h */
