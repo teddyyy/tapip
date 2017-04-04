@@ -74,16 +74,3 @@ int parse_ip_port(char *str, unsigned int *addr, unsigned short *nport)
 
 	return 0;
 }
-
-char *ip6fmt(const void *cp)
-{
-	char *ret = xmalloc(sizeof(char) * INET6_ADDRSTRLEN);
-
-	char straddr[INET6_ADDRSTRLEN];
-
-	inet_ntop(cp, straddr, sizeof(straddr));
-	ret = straddr;
-
-	return ret;
-}
-

@@ -101,6 +101,8 @@ void route(int argc, char **argv)
 
 void ifinfo(struct netdev *dev)
 {
+	char straddr[INET6_ADDRSTRLEN];
+
 	printf("%-10sHWaddr "MACFMT"\n"
 		"          IPaddr "IPFMT"\n"
 		"          IPv6addr %s/%d\n"
@@ -111,7 +113,7 @@ void ifinfo(struct netdev *dev)
 		dev->net_name,
 		macfmt(dev->net_hwaddr),
 		ipfmt(dev->net_ipaddr),
-		ip6fmt(&dev->net_ip6addr),
+		inet_ntop(&dev->net_ip6addr, straddr, sizeof(straddr)),
 		dev->net_6mask,
 		dev->net_mtu,
 		dev->net_stats.rx_packets,
