@@ -77,7 +77,8 @@ int parse_ip_port(char *str, unsigned int *addr, unsigned short *nport)
 
 char *ip6fmt(const void *cp)
 {
-	char *ret = malloc(sizeof(char) * INET6_ADDRSTRLEN);
+	char *ret = xmalloc(sizeof(char) * INET6_ADDRSTRLEN);
+
 	char straddr[INET6_ADDRSTRLEN];
 
 	inet_ntop(cp, straddr, sizeof(straddr));
